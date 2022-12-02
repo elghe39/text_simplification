@@ -110,14 +110,9 @@ def textRank(matrix: dict, damping=0.85, epslone=0.0001):
 
 
 def main(paragraph: str):
-    words_list, sentences_list = handleParagraph("These implementation flaws usually mean that the signature of the JWT is not verified properly. This enables an attacker to tamper with the values passed to the application via the token's payload. Even if the signature is robustly verified, whether it can truly be trusted relies heavily on the server's secret key remaining a secret. If this key is leaked in some way, or can be guessed or brute-forced, an attacker can generate a valid signature for any arbitrary token, compromising the entire mechanism.")
+    words_list, sentences_list = handleParagraph(paragraph)
     tfidf_vectorizer = tfidf(words_list)
     cosine_value = cosineSimilarity(tfidf_vectorizer)
     sort = sorted(textRank(cosine_value))
     res = [sentences_list[index] for index in sort]
-    print(res)
     return res
-
-
-if __name__ == '__main__':
-    main(".")

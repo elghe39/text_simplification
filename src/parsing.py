@@ -136,10 +136,5 @@ def helper(tree: Tree) -> list:
 
 
 def main(sentence: str):
-    sentence = action(
-        "This month was originally named Sextilis in Latin, because it was the sixth month in the ancient Roman calendar, which started in March about 735 BC under Romulus.")
-    print(sentence)
+    return action(sentence)
 
-
-if __name__ == '__main__':
-    main(".")
