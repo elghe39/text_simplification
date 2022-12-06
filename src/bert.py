@@ -14,7 +14,6 @@ stop_words_ = set(stopwords.words('english'))
 
 
 def process_input(input_text, word2index, sent_max_length):
-    input_text = cleaner(input_text)
     clean_text = []
     index_list = []
     input_token = []
@@ -28,14 +27,6 @@ def process_input(input_text, word2index, sent_max_length):
     return input_padded, index_list, len(clean_text)
 
 
-# Clean data
-def cleaner(word):
-    # word = re.sub(r'((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])*', '', word, flags=re.MULTILINE)
-    word = re.sub('[\W]', ' ', word)
-    word = re.sub('[^a-zA-Z]', ' ', word)
-    return word.lower().strip()
-
-
 def complete_missing_word(pred_binary, index_list, len_list):
     list_cwi_predictions = list(pred_binary[0][:len_list])
     for i in index_list:
@@ -47,8 +38,8 @@ def get_bert_candidates(input_text, list_cwi_predictions, tokenizer, model):
     numb_predictions_displayed = 10
     list_candidates_bert = []
     for word, pred in zip(input_text.split(), list_cwi_predictions):
-        if (pred and (pos_tag([word])[0][1] in ['NNS', 'NN', 'VBP', 'RB', 'VBG', 'VBD'])) or (
-                zipf_frequency(word, 'en')) < 3.1:
+        # if (pred and (pos_tag([word])[0][1] in ['NNS', 'NN', 'VBP', 'RB', 'VBG', 'VBD'])) or (zipf_frequency(word, 'en')) < 3.1:
+        if pred and (pos_tag([word])[0][1] in ['NNS', 'NN', 'VBP', 'RB', 'VBG', 'VBD']):
             replace_word_mask = input_text.replace(word, '[MASK]')
             text = f'[CLS]{replace_word_mask} [SEP] {input_text} [SEP] '
             tokenized_text = tokenizer.tokenize(text)
@@ -66,7 +57,7 @@ def get_bert_candidates(input_text, list_cwi_predictions, tokenizer, model):
     return list_candidates_bert
 
 
-def main(list_texts: list):
+def run(list_texts: list):
     model_name = 'model_CWI.h5'
     path_dir = os.getcwd() + f"/model/{model_name}"
     model_CWI = load_model(path_dir)

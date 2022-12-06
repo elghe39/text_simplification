@@ -109,7 +109,7 @@ def textRank(matrix: dict, damping=0.85, epslone=0.0001):
     return items
 
 
-def main(paragraph: str):
+def run(paragraph: str):
     words_list, sentences_list = handleParagraph(paragraph)
     tfidf_vectorizer = tfidf(words_list)
     cosine_value = cosineSimilarity(tfidf_vectorizer)

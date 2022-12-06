@@ -2,8 +2,17 @@ from nltk.parse import CoreNLPParser
 from nltk.tree import Tree, ParentedTree
 import nltk.draw.tree
 import copy
+import re
 
 parser = CoreNLPParser(url='http://localhost:9000')
+
+
+def cleaner(word):
+    word = re.sub(r'((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])*', '',
+                  word, flags=re.MULTILINE)
+    word = re.sub('[\W]', ' ', word)
+    word = re.sub('[^a-zA-Z]', ' ', word)
+    return word.lower().strip()
 
 
 def action(sentence: str):
@@ -135,6 +144,11 @@ def helper(tree: Tree) -> list:
         return [tree]
 
 
-def main(sentence: str):
-    return action(sentence)
+def run(sentence: str):
+    sentences = action(cleaner(sentence))
+    # print(sentences)
+    return sentences
 
+
+if __name__ == '__main__':
+    run('The resulting Jacquard loom was an important step in the development of computers because the use of punched cards to define woven patterns can be viewed as an early, albeit limited, form of programmability.')
