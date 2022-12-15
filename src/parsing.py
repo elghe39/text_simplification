@@ -8,11 +8,9 @@ parser = CoreNLPParser(url='http://localhost:9000')
 
 
 def cleaner(word):
-    word = re.sub(r'((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])*', '',
-                  word, flags=re.MULTILINE)
-    word = re.sub('[\W]', ' ', word)
-    word = re.sub('[^a-zA-Z]', ' ', word)
-    return word.lower().strip()
+    word = re.sub(r'((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])*',
+                  '', word, flags=re.MULTILINE)
+    return word.strip()
 
 
 def action(sentence: str):
@@ -27,18 +25,19 @@ def action(sentence: str):
     #     print(each)
     res = set()
     temp = []
-    for index, node in enumerate(treeList):
-        lis = removeConjunction(node)
-        for each in lis:
-            temp.append(each)
-    for i in temp:
+    # for index, node in enumerate(treeList):
+    #     lis = removeConjunction(node)
+    #     for each in lis:
+    #         temp.append(each)
+    for i in treeList:
         string = " ".join(i.leaves())
-        if string[-1] == ',':
-            string = string[:-2]
-        if string[-1] != '.':
-            string += '.'
-        if string[0].islower():
-            string = string[0].upper() + string[1:]
+        if len(string) == 0:
+            return [sentence]
+        else:
+            if string[-1] == ',':
+                string = string[:-2]
+            if string[0] == ',':
+                string = string[1:]
         res.add(string)
     return res
 
@@ -88,6 +87,8 @@ def removeComplex(tree: Tree):
                                 if subNode.label()[:2] == 'VB':
                                     tree2 = subNode
                                     has_tree2 = True
+                    if not has_tree1 and not has_tree2:
+                        continue
                     del tree[subTree[0].treeposition()]
                     if has_tree2:
                         treeTemp2 = copy.deepcopy(tree2)
@@ -101,54 +102,54 @@ def removeComplex(tree: Tree):
     return subTrees
 
 
-def removeConjunction(tree: Tree):
-    lis = helper(tree)
-    return lis
-
-
-def helper(tree: Tree) -> list:
-    changed = False
-    subTreeList = list()
-    result = list()
-    for subTree in list(list(tree.subtrees())):
-        if subTree.label() == 'CC':
-            parent = subTree.parent()
-            # print(parent)
-            for children in parent:
-                if children.label() != 'CC':
-                    newNode = copy.deepcopy(tree)
-                    for subTree2 in list(list(newNode.subtrees())):
-                        if subTree2 == subTree:
-                            parent2 = subTree2.parent()
-                            # print(parent2)
-
-                    toDelete = True
-                    while toDelete:
-                        for otherChildren in parent2:
-                            if children != otherChildren:
-                                del newNode[otherChildren.treeposition()]
-                                break
-                        if len(parent2) == 1:
-                            toDelete = False
-                    subTreeList.append(newNode)
-            changed = True
-            break
-    if changed:
-        for each in subTreeList:
-            newList = helper(each)
-            if len(newList) != 0:
-                for node in newList:
-                    result.append(node)
-        return result
-    else:
-        return [tree]
+# def removeConjunction(tree: Tree):
+#     lis = helper(tree)
+#     return lis
+#
+#
+# def helper(tree: Tree) -> list:
+#     changed = False
+#     subTreeList = list()
+#     result = list()
+#     for subTree in list(list(tree.subtrees())):
+#         if subTree.label() == 'CC':
+#             parent = subTree.parent()
+#             # print(parent)
+#             for children in parent:
+#                 if children.label() != 'CC':
+#                     newNode = copy.deepcopy(tree)
+#                     for subTree2 in list(list(newNode.subtrees())):
+#                         if subTree2 == subTree:
+#                             parent2 = subTree2.parent()
+#                             # print(parent2)
+#
+#                     toDelete = True
+#                     while toDelete:
+#                         for otherChildren in parent2:
+#                             if children != otherChildren:
+#                                 del newNode[otherChildren.treeposition()]
+#                                 break
+#                         if len(parent2) == 1:
+#                             toDelete = False
+#                     subTreeList.append(newNode)
+#             changed = True
+#             break
+#     if changed:
+#         for each in subTreeList:
+#             newList = helper(each)
+#             if len(newList) != 0:
+#                 for node in newList:
+#                     result.append(node)
+#         return result
+#     else:
+#         return [tree]
 
 
 def run(sentence: str):
     sentences = action(cleaner(sentence))
-    # print(sentences)
+    print(sentences)
     return sentences
 
 
 if __name__ == '__main__':
-    run('The resulting Jacquard loom was an important step in the development of computers because the use of punched cards to define woven patterns can be viewed as an early, albeit limited, form of programmability.')
+    run('Although domes normally took on the shape of a hemisphere, the Mughals in India popularized onion-shaped domes in South Asia and Persia.')

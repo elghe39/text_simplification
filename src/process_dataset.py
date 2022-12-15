@@ -10,6 +10,8 @@ def split_dataset():
                 tests = []
                 temp = []
                 for index, line in enumerate(lines):
+                    if len(tests) == 500:
+                        break
                     if line == '\n':
                         tests.append(temp)
                         temp = []
@@ -37,7 +39,8 @@ def parse_dataset():
             for sen in input:
                 parse_sens = parsing.run(sen)
                 for element in parse_sens:
-                    outstream.write(element + '\n')
+                    outstream.write(element)
+                    outstream.write('\n')
                 outstream.write('\n')
                 print(i)
                 i += 1

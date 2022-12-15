@@ -1,13 +1,20 @@
 import bert
 import parsing
+from evaluate import load
 
 
 def main():
-    sentence = "The traditional etymology is from the Latin aperire, \"to open,\" in allusion to its being the season when trees and flowers begin to \"open\"."
-    newsen = parsing.main(sentence)
-    print(newsen)
-    newbag = bert.main(newsen)
-    print(newbag)
+    sentence = "This is known as the geocentric model of the Universe.."
+    newsen = parsing.run(sentence)
+    res = bert.run(newsen)
+    print(res)
+    sari = load("sari")
+    sources = [sentence]
+    predictions = [res[0]]
+    references = [
+        ["This is known as the geocentric model of the Universe."]]
+    sari_score = sari.compute(sources=sources, predictions=predictions, references=references)
+    print(sari_score)
 
 
 if __name__ == '__main__':
